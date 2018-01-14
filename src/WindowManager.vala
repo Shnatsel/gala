@@ -711,7 +711,8 @@ namespace Gala
 			}
 		}
 
-		public override void show_tile_preview (Meta.Window window, Meta.Rectangle tile_rect, int tile_monitor_number) {
+		public override void show_tile_preview (Meta.Window window, Meta.Rectangle tile_rect, int tile_monitor_number)
+		{
 			if (tile_preview == null) {
 				tile_preview = new Clutter.Actor ();
 				tile_preview.background_color = { 100, 186, 255, 100 };
@@ -747,7 +748,8 @@ namespace Gala
 			tile_preview.restore_easing_state ();
 		}
 
-		public override void hide_tile_preview () {
+		public override void hide_tile_preview ()
+		{
 			if (tile_preview != null) {
 				tile_preview.remove_all_transitions ();
 				tile_preview.opacity = 0U;
