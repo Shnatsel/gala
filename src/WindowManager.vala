@@ -741,11 +741,16 @@ namespace Gala
 			tile_preview.set_position (tile_rect.x, tile_rect.y);
 			tile_preview.set_size (tile_rect.width, tile_rect.height);
 			tile_preview.show ();
-			tile_preview.save_easing_state ();
-			tile_preview.set_easing_mode (Clutter.AnimationMode.EASE_IN_OUT_QUAD);
-			tile_preview.set_easing_duration (duration);
-			tile_preview.opacity = 255U;
-			tile_preview.restore_easing_state ();
+
+			if (animation_settings.enable_animations) {
+				tile_preview.save_easing_state ();
+				tile_preview.set_easing_mode (Clutter.AnimationMode.EASE_IN_OUT_QUAD);
+				tile_preview.set_easing_duration (duration);
+				tile_preview.opacity = 255U;
+				tile_preview.restore_easing_state ();
+			} else {
+				tile_preview.opacity = 255U;
+			}
 		}
 
 		public override void hide_tile_preview ()
