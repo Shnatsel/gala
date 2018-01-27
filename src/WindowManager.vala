@@ -739,8 +739,10 @@ namespace Gala
 				if (Utils.get_n_windows (win_ws) <= 1)
 					return;
 
-				var new_ws_index = screen.get_n_workspaces () - 1;
 				var old_ws_index = win_ws.index ();
+				var new_ws_index = old_ws_index + 1;
+				shift_workspaces (new_ws_index, 1);
+
 				var new_ws_obj = screen.get_workspace_by_index (new_ws_index);
 				window.change_workspace (new_ws_obj);
 				new_ws_obj.activate_with_focus (window, time);
@@ -757,6 +759,48 @@ namespace Gala
 				}
 
 				ws_assoc.remove (window);
+			}
+		}
+
+		void shift_workspaces (int from, int n)
+		{
+			unowned Meta.Screen screen = get_screen ();
+			var time = screen.get_display ().get_current_time ();
+
+			for (int i = 0; i < n; i++) {
+				screen.append_new_workspace (false, time);
+			}
+
+			int dynamic_offset = Prefs.get_dynamic_workspaces () ? 1 : 0;
+
+			int n_workspaces = screen.get_n_workspaces ();
+			if (n_workspaces < 2 + n + dynamic_offset) {
+				return;
+			}
+
+			for (int i = n_workspaces - (1 + dynamic_offset); i >= from; i--) {
+				unowned Meta.Workspace? ws_from = screen.get_workspace_by_index (i);
+				if (ws_from == null) {
+					continue;
+				}
+
+				unowned Meta.Workspace? ws_to = screen.get_workspace_by_index (i + n);
+				if (ws_to == null) {
+					continue;
+				}
+
+				GLib.List<weak Meta.Window> windows = ws_from.list_windows ();
+				windows.@foreach ((window) => {
+					if (window.is_on_all_workspaces ()) {
+						return;
+					}
+					
+					if (window.window_type == Meta.WindowType.NORMAL ||
+						window.window_type == Meta.WindowType.DIALOG ||
+						window.window_type == Meta.WindowType.MODAL_DIALOG) {
+						window.change_workspace (ws_to);
+					}
+				});
 			}
 		}
 
